@@ -220,9 +220,12 @@ function App() {
       if (!data.content) throw new Error(data.error?.message || "Sem resposta");
 
       const text = data.content[0]?.text || "";
-      const clean = text.replace(/```json|```/g, "").trim();
+      const start = text.indexOf('{');
+      const end = text.lastIndexOf('}');
+      if (start === -1 || end === -1) throw new Error("Sem JSON: " + text.substring(0,80));
+      const clean = text.substring(start, end + 1);
       const parsed = JSON.parse(clean);
-      if (!parsed.areas) throw new Error("Formato inválido");
+      if (!parsed.areas) throw new Error("Formato invalido");
 
       setGuide({ ...parsed, appName, platforms: selPlat.join(" + ").toUpperCase() });
       setAreaIdx(0); setChecked({}); setPhase("session");
